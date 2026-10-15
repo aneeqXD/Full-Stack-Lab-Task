@@ -1,0 +1,276 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task 5 - Modular Transcript Processing &amp; JSON</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono&display=swap"><style>
+:root{--bg:#e9eef2;--paper:#fbfcfd;--ink:#10202f;--mute:#546574;--line:#c9d4dc;--accent:hsl(var(--h,160) 72% 30%);--grid:rgba(16,32,47,.05);color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0c131a;--paper:#131d27;--ink:#e6edf3;--mute:#8da0b0;--line:#25343f;--accent:hsl(var(--h,160) 72% 64%);--grid:rgba(230,237,243,.045)}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg) linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px;font:16px/1.65 "Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em;line-height:1.15}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.hero{padding:64px 0 28px}
+.hero p.sub{margin:0 0 6px;color:var(--mute)}
+.hero h1{font-size:clamp(2.3rem,6vw,4rem);margin:.1em 0 .25em;max-width:14ch}
+.hero .lead{max-width:56ch;color:var(--mute);margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.88rem}
+.chip b{color:var(--mute);font-weight:500;margin-right:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:20px 0 72px}
+.card{display:flex;flex-direction:column;gap:10px;min-height:230px;background:var(--paper);border:1px solid var(--line);border-radius:6px 22px 6px 6px;padding:22px;text-decoration:none;color:inherit;transition:background .18s,color .18s,border-color .18s}
+.card .no{font:700 2.6rem/1 "Bricolage Grotesque",ui-sans-serif,sans-serif;color:var(--accent);transition:color .18s}
+.card h3{margin:0;font-size:1.12rem}
+.card p{margin:0;font-size:.92rem;color:var(--mute);flex:1;transition:color .18s}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font:.74rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--mute)}
+.card:hover,.card:focus-visible{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card:hover .no,.card:focus-visible .no{color:var(--accent)}
+.card:hover p,.card:focus-visible p{color:var(--bg);opacity:.8}
+.card:hover .tags span{color:var(--bg);border-color:rgba(255,255,255,.35)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0 0;font-size:.92rem}
+.top a{color:var(--mute);text-decoration:none}.top a:hover{color:var(--accent)}
+.page-head{padding:28px 0 8px}
+.page-head h1{font-size:clamp(1.8rem,4.5vw,2.9rem);margin:.2em 0 .3em}
+.page-head p{max-width:64ch;color:var(--mute);margin:0 0 18px}
+section{margin:38px 0}
+h2{font-size:1.3rem;margin:0 0 12px}
+.notes{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:6px 22px}
+.notes p,.notes li{max-width:80ch}
+.notes code,td code{font:.86em "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.win{background:#0d1219;border:1px solid #243140;border-radius:10px;overflow:hidden;margin:14px 0}
+.bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:#161e29;color:#8fa1b3;font:.78rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+.bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.bar .r{background:#ff5f57}.bar .y{background:#febc2e}.bar .g{background:#28c840}
+.bar em{margin-left:8px;font-style:normal}
+pre{margin:0;padding:16px 18px;overflow:auto;color:#d5dde6;font:.8rem/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}
+.out pre{color:#b9f3d6}
+.c{color:#6c7f92;font-style:italic}.s{color:#a6e22e}.k{color:#c792ea}.n{color:#ffb86c}.p{color:#5ec4ff}
+.pager{display:flex;justify-content:space-between;gap:12px;padding:8px 0 56px}
+.pager a{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 16px;text-decoration:none;color:var(--ink)}
+.pager a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--mute);font-size:.88rem}
+@media (max-width:560px){.wrap{padding:0 16px}.hero{padding-top:40px}}
+
+.card{--accent:hsl(var(--h,160) 72% 30%)}
+@media (prefers-color-scheme:dark){.card{--accent:hsl(var(--h,160) 72% 64%)}}
+.win{box-shadow:0 18px 40px -24px hsl(var(--h,160) 70% 40%/.55)}
+.page-head h1{border-left:6px solid var(--accent);padding-left:14px}
+
+:root{--h:190}</style></head><body>
+<div class="wrap"><div class="top"><a href="index.html">&larr; All tasks</a><span>Task 5 of 8</span></div>
+<div class="page-head"><h1>Task 5: Modular Transcript Processing &amp; JSON</h1><p>Four ES modules that parse, validate and report transcripts, with typed errors and try/catch/finally.</p><div class="chips"><span class="chip"><b>Name</b>Aneeq Abdullah</span><span class="chip"><b>Reg no</b>241803</span><span class="chip"><b>Class</b>BSCS VA</span><span class="chip"><b>Course</b>FSWD Lab</span><span class="chip"><b>Lab</b>Lab 5</span></div></div>
+<section><h2>Approach and explanation</h2><div class="notes"><p><b>Modules.</b> <code>Student.js</code> has a <em>default</em> export; <code>gradeUtils.js</code> has only <em>named</em> exports; <code>transcriptService.js</code> imports both kinds and aliases one (<code>calculateGrade as letterGrade</code>); <code>main.js</code> imports from all of them. <code>package.json</code> sets <code>"type": "module"</code> so Node treats the files as ES modules.</p><table><tr><th>Problem</th><th>Error type</th></tr><tr><td>Malformed JSON</td><td><code>SyntaxError</code></td></tr><tr><td>Not an array, missing id, missing name, missing course code, marks not a number</td><td><code>TypeError</code></td></tr><tr><td>Marks below 0 or above 100</td><td><code>RangeError</code></td></tr><tr><td>Duplicate student id</td><td><code>Error</code></td></tr></table><p>The caller wraps every case in <code>try / catch / finally</code>; the <code>finally</code> line prints whether the case passed or failed.</p></div></section>
+<section><h2>Source code</h2><div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>main.js</em></div><pre><span class="c">// main.js - the caller: demonstrates try / catch / finally for every case</span>
+<span class="k">import</span> { parseTranscripts, buildReport, reportToJSON } <span class="k">from</span> <span class="s">'./transcriptService.js'</span>;
+<span class="k">import</span> Student <span class="k">from</span> <span class="s">'./Student.js'</span>;
+<span class="k">import</span> { calculateGPA <span class="k">as</span> gpaOf, calculateAverage } <span class="k">from</span> <span class="s">'./gradeUtils.js'</span>;
+
+<span class="k">const</span> j = (value) =&gt; JSON.stringify(value);
+<span class="k">const</span> cases = [
+  [<span class="s">'valid data'</span>, <span class="s">`[
+    { "id": 101, "name": "Ali", "courses": [ { "code": "CS301", "marks": 81 }, { "code": "CS302", "marks": 74 } ] },
+    { "id": 102, "name": "Sara", "courses": [ { "code": "CS301", "marks": 93 }, { "code": "CS302", "marks": 48 } ] }
+  ]`</span>],
+  [<span class="s">'malformed JSON'</span>, <span class="s">'[ { "id": 1, "name": "Broken", '</span>],
+  [<span class="s">'not an array'</span>, j({ id: <span class="n">1</span> })],
+  [<span class="s">'missing student id'</span>, j([{ name: <span class="s">'NoId'</span>, courses: [] }])],
+  [<span class="s">'duplicate ids'</span>, j([{ id: <span class="n">7</span>, name: <span class="s">'A'</span>, courses: [] }, { id: <span class="n">7</span>, name: <span class="s">'B'</span>, courses: [] }])],
+  [<span class="s">'marks above 100'</span>, j([{ id: <span class="n">1</span>, name: <span class="s">'High'</span>, courses: [{ code: <span class="s">'CS301'</span>, marks: <span class="n">101</span> }] }])],
+  [<span class="s">'marks below 0'</span>, j([{ id: <span class="n">2</span>, name: <span class="s">'Low'</span>, courses: [{ code: <span class="s">'CS301'</span>, marks: -<span class="n">5</span> }] }])],
+  [<span class="s">'missing course code'</span>, j([{ id: <span class="n">3</span>, name: <span class="s">'NoCode'</span>, courses: [{ marks: <span class="n">70</span> }] }])],
+  [<span class="s">'boundary marks 0 and 100'</span>, j([{ id: <span class="n">4</span>, name: <span class="s">'Edge'</span>, courses: [{ code: <span class="s">'A'</span>, marks: <span class="n">0</span> }, { code: <span class="s">'B'</span>, marks: <span class="n">100</span> }] }])],
+];
+
+<span class="k">for</span> (<span class="k">const</span> [label, raw] <span class="k">of</span> cases) {
+  console.log(<span class="s">`\n### ${label}`</span>);
+  <span class="k">try</span> {
+    <span class="k">const</span> report = buildReport(parseTranscripts(raw));
+    <span class="k">const</span> json = reportToJSON(report); <span class="c">// JS object -&gt; JSON string</span>
+    console.log(label === <span class="s">'valid data'</span> ? json : j(report));
+    console.log(<span class="s">'round-trip OK:'</span>, JSON.parse(json).totalStudents === report.totalStudents);
+  } <span class="k">catch</span> (err) {
+    console.log(<span class="s">`${err.constructor.name}: ${err.message}`</span>);
+  } <span class="k">finally</span> {
+    console.log(<span class="s">'(finally) case processed'</span>);
+  }
+}
+
+console.log(<span class="s">'\n### direct use of the modules'</span>);
+<span class="k">const</span> demo = <span class="k">new</span> Student(<span class="n">9</span>, <span class="s">'Demo'</span>, [{ code: <span class="s">'X'</span>, marks: <span class="n">80</span> }, { code: <span class="s">'Y'</span>, marks: <span class="n">60</span> }]);
+console.log(<span class="s">'average:'</span>, demo.average, <span class="s">'| gpa:'</span>, demo.gpa, <span class="s">'| gpaOf([]):'</span>, gpaOf([]), <span class="s">'| calculateAverage(null):'</span>, calculateAverage(<span class="k">null</span>));
+</pre></div>
+<div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>Student.js</em></div><pre><span class="c">// Student.js - default export</span>
+<span class="k">import</span> { calculateAverage, calculateGPA } <span class="k">from</span> <span class="s">'./gradeUtils.js'</span>;
+
+<span class="k">export</span> <span class="k">default</span> <span class="k">class</span> Student {
+  constructor(id, name, courses = []) {
+    <span class="k">this</span>.id = id;
+    <span class="k">this</span>.name = name;
+    <span class="k">this</span>.courses = courses;
+  }
+  <span class="k">get</span> marks() {
+    <span class="k">return</span> <span class="k">this</span>.courses.map((c) =&gt; c.marks);
+  }
+  <span class="k">get</span> average() {
+    <span class="k">return</span> calculateAverage(<span class="k">this</span>.marks);
+  }
+  <span class="k">get</span> gpa() {
+    <span class="k">return</span> calculateGPA(<span class="k">this</span>.marks);
+  }
+}
+</pre></div>
+<div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>gradeUtils.js</em></div><pre><span class="c">// gradeUtils.js - named exports only</span>
+<span class="k">const</span> SCALE = [
+  [<span class="n">85</span>, <span class="s">'A'</span>, <span class="n">4.0</span>], [<span class="n">80</span>, <span class="s">'A-'</span>, <span class="n">3.67</span>], [<span class="n">75</span>, <span class="s">'B+'</span>, <span class="n">3.33</span>], [<span class="n">70</span>, <span class="s">'B'</span>, <span class="n">3.0</span>],
+  [<span class="n">65</span>, <span class="s">'B-'</span>, <span class="n">2.67</span>], [<span class="n">60</span>, <span class="s">'C+'</span>, <span class="n">2.33</span>], [<span class="n">50</span>, <span class="s">'C'</span>, <span class="n">2.0</span>], [<span class="n">0</span>, <span class="s">'F'</span>, <span class="n">0</span>],
+];
+<span class="k">const</span> round2 = (n) =&gt; Math.round(n * <span class="n">100</span>) / <span class="n">100</span>;
+
+<span class="k">export</span> <span class="k">function</span> calculateGrade(marks) {
+  <span class="k">const</span> [, letter] = SCALE.find(([min]) =&gt; marks &gt;= min);
+  <span class="k">return</span> letter;
+}
+
+<span class="k">export</span> <span class="k">function</span> calculateGradePoints(marks) {
+  <span class="k">const</span> [, , points] = SCALE.find(([min]) =&gt; marks &gt;= min);
+  <span class="k">return</span> points;
+}
+
+<span class="k">export</span> <span class="k">function</span> calculateAverage(values) {
+  <span class="k">if</span> (!Array.isArray(values) || values.length === <span class="n">0</span>) <span class="k">return</span> <span class="n">0</span>;
+  <span class="k">return</span> round2(values.reduce((sum, v) =&gt; sum + v, <span class="n">0</span>) / values.length);
+}
+
+<span class="k">export</span> <span class="k">function</span> calculateGPA(marksList) {
+  <span class="k">return</span> calculateAverage(marksList.map((m) =&gt; calculateGradePoints(m)));
+}
+</pre></div>
+<div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>transcriptService.js</em></div><pre><span class="c">// transcriptService.js - default import (Student) + named import with an alias</span>
+<span class="k">import</span> Student <span class="k">from</span> <span class="s">'./Student.js'</span>;
+<span class="k">import</span> { calculateGrade <span class="k">as</span> letterGrade } <span class="k">from</span> <span class="s">'./gradeUtils.js'</span>;
+
+<span class="k">export</span> <span class="k">function</span> parseTranscripts(rawJson) {
+  <span class="k">let</span> data;
+  <span class="k">try</span> {
+    data = JSON.parse(rawJson);
+  } <span class="k">catch</span> (err) {
+    <span class="k">throw</span> <span class="k">new</span> SyntaxError(<span class="s">`Malformed JSON: ${err.message}`</span>);
+  }
+  <span class="k">if</span> (!Array.isArray(data)) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">'Transcript data must be an array of students'</span>);
+
+  <span class="k">const</span> seenIds = <span class="k">new</span> Set();
+  <span class="k">return</span> data.map((entry, index) =&gt; {
+    <span class="k">const</span> { id, name, courses } = entry ?? {};
+    <span class="k">if</span> (id === <span class="k">undefined</span> || id === <span class="k">null</span> || id === <span class="s">''</span>) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">`Student at index ${index} has no id`</span>);
+    <span class="k">if</span> (seenIds.has(id)) <span class="k">throw</span> <span class="k">new</span> Error(<span class="s">`Duplicate student id: ${id}`</span>);
+    seenIds.add(id);
+    <span class="k">if</span> (<span class="k">typeof</span> name !== <span class="s">'string'</span> || name.trim() === <span class="s">''</span>) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">`Student ${id} has no name`</span>);
+    <span class="k">if</span> (!Array.isArray(courses)) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">`Student ${id}: courses must be an array`</span>);
+
+    <span class="k">for</span> (<span class="k">const</span> { code, marks } <span class="k">of</span> courses) {
+      <span class="k">if</span> (<span class="k">typeof</span> code !== <span class="s">'string'</span> || code.trim() === <span class="s">''</span>) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">`Student ${id}: a course code is missing`</span>);
+      <span class="k">if</span> (<span class="k">typeof</span> marks !== <span class="s">'number'</span> || Number.isNaN(marks)) <span class="k">throw</span> <span class="k">new</span> TypeError(<span class="s">`Student ${id}, ${code}: marks must be a number`</span>);
+      <span class="k">if</span> (marks &lt; <span class="n">0</span> || marks &gt; <span class="n">100</span>) <span class="k">throw</span> <span class="k">new</span> RangeError(<span class="s">`Student ${id}, ${code}: marks ${marks} must be between 0 and 100`</span>);
+    }
+    <span class="k">return</span> <span class="k">new</span> Student(id, name.trim(), courses);
+  });
+}
+
+<span class="k">export</span> <span class="k">function</span> buildReport(students) {
+  <span class="k">return</span> {
+    totalStudents: students.length,
+    students: students.map((s) =&gt; ({
+      id: s.id,
+      name: s.name,
+      average: s.average,
+      gpa: s.gpa,
+      courses: s.courses.map((c) =&gt; ({ ...c, grade: letterGrade(c.marks) })),
+    })),
+  };
+}
+
+<span class="k">export</span> <span class="k">const</span> reportToJSON = (report) =&gt; JSON.stringify(report, <span class="k">null</span>, <span class="n">2</span>);
+</pre></div></section>
+<section><h2>Node.js output</h2><div class="win out"><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>PS CampusFlow-Lab5&gt; node main.js</em></div><pre>
+### valid data
+{
+  "totalStudents": 2,
+  "students": [
+    {
+      "id": 101,
+      "name": "Ali",
+      "average": 77.5,
+      "gpa": 3.34,
+      "courses": [
+        {
+          "code": "CS301",
+          "marks": 81,
+          "grade": "A-"
+        },
+        {
+          "code": "CS302",
+          "marks": 74,
+          "grade": "B"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Sara",
+      "average": 70.5,
+      "gpa": 2,
+      "courses": [
+        {
+          "code": "CS301",
+          "marks": 93,
+          "grade": "A"
+        },
+        {
+          "code": "CS302",
+          "marks": 48,
+          "grade": "F"
+        }
+      ]
+    }
+  ]
+}
+round-trip OK: true
+(finally) case processed
+
+### malformed JSON
+SyntaxError: Malformed JSON: Expected double-quoted property name in JSON at position 31 (line 1 column 32)
+(finally) case processed
+
+### not an array
+TypeError: Transcript data must be an array of students
+(finally) case processed
+
+### missing student id
+TypeError: Student at index 0 has no id
+(finally) case processed
+
+### duplicate ids
+Error: Duplicate student id: 7
+(finally) case processed
+
+### marks above 100
+RangeError: Student 1, CS301: marks 101 must be between 0 and 100
+(finally) case processed
+
+### marks below 0
+RangeError: Student 2, CS301: marks -5 must be between 0 and 100
+(finally) case processed
+
+### missing course code
+TypeError: Student 3: a course code is missing
+(finally) case processed
+
+### boundary marks 0 and 100
+{"totalStudents":1,"students":[{"id":4,"name":"Edge","average":50,"gpa":2,"courses":[{"code":"A","marks":0,"grade":"F"},{"code":"B","marks":100,"grade":"A"}]}]}
+round-trip OK: true
+(finally) case processed
+
+### direct use of the modules
+average: 70 | gpa: 3 | gpaOf([]): 0 | calculateAverage(null): 0</pre></div></section>
+<div class="pager"><a href="task4.html">&larr; Task 4</a><a href="task6.html">Task 6 &rarr;</a></div></div><footer><div class="wrap">Aneeq Abdullah &middot; 241803 &middot; BSCS VA &middot; FSWD Lab &middot; Lab 5</div></footer></body></html>

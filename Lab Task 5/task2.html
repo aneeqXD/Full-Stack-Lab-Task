@@ -1,0 +1,160 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task 2 - Academic Performance Intelligence Engine</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono&display=swap"><style>
+:root{--bg:#e9eef2;--paper:#fbfcfd;--ink:#10202f;--mute:#546574;--line:#c9d4dc;--accent:hsl(var(--h,160) 72% 30%);--grid:rgba(16,32,47,.05);color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0c131a;--paper:#131d27;--ink:#e6edf3;--mute:#8da0b0;--line:#25343f;--accent:hsl(var(--h,160) 72% 64%);--grid:rgba(230,237,243,.045)}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg) linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px;font:16px/1.65 "Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em;line-height:1.15}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.hero{padding:64px 0 28px}
+.hero p.sub{margin:0 0 6px;color:var(--mute)}
+.hero h1{font-size:clamp(2.3rem,6vw,4rem);margin:.1em 0 .25em;max-width:14ch}
+.hero .lead{max-width:56ch;color:var(--mute);margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.88rem}
+.chip b{color:var(--mute);font-weight:500;margin-right:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:20px 0 72px}
+.card{display:flex;flex-direction:column;gap:10px;min-height:230px;background:var(--paper);border:1px solid var(--line);border-radius:6px 22px 6px 6px;padding:22px;text-decoration:none;color:inherit;transition:background .18s,color .18s,border-color .18s}
+.card .no{font:700 2.6rem/1 "Bricolage Grotesque",ui-sans-serif,sans-serif;color:var(--accent);transition:color .18s}
+.card h3{margin:0;font-size:1.12rem}
+.card p{margin:0;font-size:.92rem;color:var(--mute);flex:1;transition:color .18s}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font:.74rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--mute)}
+.card:hover,.card:focus-visible{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card:hover .no,.card:focus-visible .no{color:var(--accent)}
+.card:hover p,.card:focus-visible p{color:var(--bg);opacity:.8}
+.card:hover .tags span{color:var(--bg);border-color:rgba(255,255,255,.35)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0 0;font-size:.92rem}
+.top a{color:var(--mute);text-decoration:none}.top a:hover{color:var(--accent)}
+.page-head{padding:28px 0 8px}
+.page-head h1{font-size:clamp(1.8rem,4.5vw,2.9rem);margin:.2em 0 .3em}
+.page-head p{max-width:64ch;color:var(--mute);margin:0 0 18px}
+section{margin:38px 0}
+h2{font-size:1.3rem;margin:0 0 12px}
+.notes{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:6px 22px}
+.notes p,.notes li{max-width:80ch}
+.notes code,td code{font:.86em "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.win{background:#0d1219;border:1px solid #243140;border-radius:10px;overflow:hidden;margin:14px 0}
+.bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:#161e29;color:#8fa1b3;font:.78rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+.bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.bar .r{background:#ff5f57}.bar .y{background:#febc2e}.bar .g{background:#28c840}
+.bar em{margin-left:8px;font-style:normal}
+pre{margin:0;padding:16px 18px;overflow:auto;color:#d5dde6;font:.8rem/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}
+.out pre{color:#b9f3d6}
+.c{color:#6c7f92;font-style:italic}.s{color:#a6e22e}.k{color:#c792ea}.n{color:#ffb86c}.p{color:#5ec4ff}
+.pager{display:flex;justify-content:space-between;gap:12px;padding:8px 0 56px}
+.pager a{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 16px;text-decoration:none;color:var(--ink)}
+.pager a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--mute);font-size:.88rem}
+@media (max-width:560px){.wrap{padding:0 16px}.hero{padding-top:40px}}
+
+.card{--accent:hsl(var(--h,160) 72% 30%)}
+@media (prefers-color-scheme:dark){.card{--accent:hsl(var(--h,160) 72% 64%)}}
+.win{box-shadow:0 18px 40px -24px hsl(var(--h,160) 70% 40%/.55)}
+.page-head h1{border-left:6px solid var(--accent);padding-left:14px}
+
+:root{--h:215}</style></head><body>
+<div class="wrap"><div class="top"><a href="index.html">&larr; All tasks</a><span>Task 2 of 8</span></div>
+<div class="page-head"><h1>Task 2: Academic Performance Intelligence Engine</h1><p>Grades, ranks, department statistics and queries built from array methods instead of loops.</p><div class="chips"><span class="chip"><b>Name</b>Aneeq Abdullah</span><span class="chip"><b>Reg no</b>241803</span><span class="chip"><b>Class</b>BSCS VA</span><span class="chip"><b>Course</b>FSWD Lab</span><span class="chip"><b>Lab</b>Lab 5</span></div></div>
+<section><h2>Approach and explanation</h2><div class="notes"><p><b>Mutating methods.</b> <code>sort()</code> (and <code>push</code>, <code>splice</code>, <code>reverse</code>) change the array they are called on, so the ranking sorts a copy made with <code>[...list]</code>. <code>map</code>, <code>filter</code>, <code>slice</code>, <code>concat</code> and <code>reduce</code> return new values. The output confirms the original order is untouched.</p><p><b>Department statistics.</b> A single <code>reduce()</code> creates a bucket the first time a department is seen (<code>acc[department] ?? {...}</code>), so a new department such as <code>DS</code> works with no code change. The marks table is the policy shown in the lab sheet (A-, B- and C+ included); pass mark is 50.</p></div></section>
+<section><h2>Source code</h2><div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>task2.js</em></div><pre><span class="c">// Task 2 - Academic Performance Intelligence Engine</span>
+<span class="k">const</span> results = [
+  { id: <span class="n">1</span>, name: <span class="s">'Ali'</span>, department: <span class="s">'CS'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">82</span> },
+  { id: <span class="n">2</span>, name: <span class="s">'Sara'</span>, department: <span class="s">'CS'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">91</span> },
+  { id: <span class="n">3</span>, name: <span class="s">'Usman'</span>, department: <span class="s">'SE'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">47</span> },
+  { id: <span class="n">4</span>, name: <span class="s">'Hina'</span>, department: <span class="s">'AI'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">73</span> },
+  { id: <span class="n">5</span>, name: <span class="s">'Ahmed'</span>, department: <span class="s">'SE'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">64</span> },
+  { id: <span class="n">6</span>, name: <span class="s">'Zoya'</span>, department: <span class="s">'AI'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">91</span> },
+];
+
+<span class="k">const</span> POLICY = [
+  { min: <span class="n">85</span>, grade: <span class="s">'A'</span>, points: <span class="n">4.0</span> }, { min: <span class="n">80</span>, grade: <span class="s">'A-'</span>, points: <span class="n">3.67</span> },
+  { min: <span class="n">75</span>, grade: <span class="s">'B+'</span>, points: <span class="n">3.33</span> }, { min: <span class="n">70</span>, grade: <span class="s">'B'</span>, points: <span class="n">3.0</span> },
+  { min: <span class="n">65</span>, grade: <span class="s">'B-'</span>, points: <span class="n">2.67</span> }, { min: <span class="n">60</span>, grade: <span class="s">'C+'</span>, points: <span class="n">2.33</span> },
+  { min: <span class="n">50</span>, grade: <span class="s">'C'</span>, points: <span class="n">2.0</span> }, { min: -Infinity, grade: <span class="s">'F'</span>, points: <span class="n">0</span> },
+];
+<span class="k">const</span> PASS_MARK = <span class="n">50</span>;
+
+<span class="c">// A. Result processing (map returns a NEW array of NEW objects)</span>
+<span class="k">const</span> gradeFor = (marks) =&gt; POLICY.find((rule) =&gt; marks &gt;= rule.min);
+<span class="k">const</span> processResults = (list) =&gt;
+  list.map((r) =&gt; {
+    <span class="k">const</span> { grade, points } = gradeFor(r.marks);
+    <span class="k">return</span> { ...r, grade, status: r.marks &gt;= PASS_MARK ? <span class="s">'PASS'</span> : <span class="s">'FAIL'</span>, gradePoints: points };
+  });
+
+<span class="c">// B. Ranked list: sort() MUTATES, so sort a copy made with spread</span>
+<span class="k">const</span> rank = (list) =&gt; [...list].sort((a, b) =&gt; b.marks - a.marks || a.name.localeCompare(b.name));
+
+<span class="c">// C. Department statistics - departments are discovered from the data, so "DS" works automatically</span>
+<span class="k">const</span> departmentStats = (list) =&gt; {
+  <span class="k">const</span> totals = list.reduce((acc, { department, marks, status }) =&gt; {
+    <span class="k">const</span> d = acc[department] ?? { students: <span class="n">0</span>, sum: <span class="n">0</span>, highest: -Infinity, passed: <span class="n">0</span> };
+    <span class="k">return</span> { ...acc, [department]: { students: d.students + <span class="n">1</span>, sum: d.sum + marks, highest: Math.max(d.highest, marks), passed: d.passed + (status === <span class="s">'PASS'</span> ? <span class="n">1</span> : <span class="n">0</span>) } };
+  }, {});
+  <span class="k">return</span> Object.fromEntries(
+    Object.entries(totals).map(([dept, d]) =&gt; [dept, { students: d.students, average: Number((d.sum / d.students).toFixed(<span class="n">2</span>)), highest: d.highest, passed: d.passed }])
+  );
+};
+
+<span class="k">const</span> idsBefore = results.map((r) =&gt; r.id).join(<span class="s">','</span>);
+<span class="k">const</span> processed = processResults(results);
+console.log(<span class="s">'A. Processed results'</span>);
+console.table(processed.map(({ name, marks, grade, status, gradePoints }) =&gt; ({ name, marks, grade, status, gradePoints })));
+
+<span class="k">const</span> ranked = rank(processed);
+console.log(<span class="s">'B. Ranked merit list:'</span>, ranked.map((r) =&gt; <span class="s">`${r.name}(${r.marks})`</span>).join(<span class="s">' &gt; '</span>));
+console.log(<span class="s">'   original order kept:'</span>, results.map((r) =&gt; r.id).join(<span class="s">','</span>) === idsBefore, <span class="s">'| keys of original row:'</span>, Object.keys(results[<span class="n">0</span>]).join(<span class="s">','</span>));
+
+console.log(<span class="s">'\nC. Department statistics'</span>);
+console.log(departmentStats(processed));
+<span class="k">const</span> withDS = [...processed, ...processResults([{ id: <span class="n">7</span>, name: <span class="s">'Dania'</span>, department: <span class="s">'DS'</span>, course: <span class="s">'FSWD'</span>, marks: <span class="n">55</span> }])];
+console.log(<span class="s">'   after a new "DS" department appears:'</span>, departmentStats(withDS).DS);
+
+console.log(<span class="s">'\nD. Academic queries'</span>);
+<span class="k">const</span> average = processed.reduce((sum, r) =&gt; sum + r.marks, <span class="n">0</span>) / processed.length;
+console.log(<span class="s">'first scoring &gt; 85         :'</span>, processed.find((r) =&gt; r.marks &gt; <span class="n">85</span>)?.name);
+console.log(<span class="s">'index of first failed      :'</span>, processed.findIndex((r) =&gt; r.status === <span class="s">'FAIL'</span>));
+console.log(<span class="s">'at least one failed        :'</span>, processed.some((r) =&gt; r.status === <span class="s">'FAIL'</span>));
+console.log(<span class="s">'all marks within 0-100     :'</span>, processed.every((r) =&gt; r.marks &gt;= <span class="n">0</span> &amp;&amp; r.marks &lt;= <span class="n">100</span>));
+console.log(<span class="s">'same check with bad data   :'</span>, [...processed, { marks: <span class="n">120</span> }].every((r) =&gt; r.marks &gt;= <span class="n">0</span> &amp;&amp; r.marks &lt;= <span class="n">100</span>));
+console.log(<span class="s">`overall average            : ${average.toFixed(2)}`</span>);
+console.log(<span class="s">'above average              :'</span>, processed.filter((r) =&gt; r.marks &gt; average).map((r) =&gt; r.name));
+console.log(<span class="s">'top three                  :'</span>, ranked.slice(<span class="n">0</span>, <span class="n">3</span>).map((r) =&gt; r.name));
+</pre></div></section>
+<section><h2>Node.js output</h2><div class="win out"><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>PS CampusFlow-Lab5&gt; node task2.js</em></div><pre>A. Processed results
+┌─────────┬─────────┬───────┬───────┬────────┬─────────────┐
+│ (index) │ name    │ marks │ grade │ status │ gradePoints │
+├─────────┼─────────┼───────┼───────┼────────┼─────────────┤
+│ 0       │ 'Ali'   │ 82    │ 'A-'  │ 'PASS' │ 3.67        │
+│ 1       │ 'Sara'  │ 91    │ 'A'   │ 'PASS' │ 4           │
+│ 2       │ 'Usman' │ 47    │ 'F'   │ 'FAIL' │ 0           │
+│ 3       │ 'Hina'  │ 73    │ 'B'   │ 'PASS' │ 3           │
+│ 4       │ 'Ahmed' │ 64    │ 'C+'  │ 'PASS' │ 2.33        │
+│ 5       │ 'Zoya'  │ 91    │ 'A'   │ 'PASS' │ 4           │
+└─────────┴─────────┴───────┴───────┴────────┴─────────────┘
+B. Ranked merit list: Sara(91) &gt; Zoya(91) &gt; Ali(82) &gt; Hina(73) &gt; Ahmed(64) &gt; Usman(47)
+   original order kept: true | keys of original row: id,name,department,course,marks
+
+C. Department statistics
+{
+  CS: { students: 2, average: 86.5, highest: 91, passed: 2 },
+  SE: { students: 2, average: 55.5, highest: 64, passed: 1 },
+  AI: { students: 2, average: 82, highest: 91, passed: 2 }
+}
+   after a new "DS" department appears: { students: 1, average: 55, highest: 55, passed: 1 }
+
+D. Academic queries
+first scoring &gt; 85         : Sara
+index of first failed      : 2
+at least one failed        : true
+all marks within 0-100     : true
+same check with bad data   : false
+overall average            : 74.67
+above average              : [ 'Ali', 'Sara', 'Zoya' ]
+top three                  : [ 'Sara', 'Zoya', 'Ali' ]</pre></div></section>
+<div class="pager"><a href="task1.html">&larr; Task 1</a><a href="task3.html">Task 3 &rarr;</a></div></div><footer><div class="wrap">Aneeq Abdullah &middot; 241803 &middot; BSCS VA &middot; FSWD Lab &middot; Lab 5</div></footer></body></html>
