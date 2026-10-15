@@ -1,0 +1,226 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task 8 - Concurrent API Aggregator (async/await)</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono&display=swap"><style>
+:root{--bg:#e9eef2;--paper:#fbfcfd;--ink:#10202f;--mute:#546574;--line:#c9d4dc;--accent:hsl(var(--h,160) 72% 30%);--grid:rgba(16,32,47,.05);color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0c131a;--paper:#131d27;--ink:#e6edf3;--mute:#8da0b0;--line:#25343f;--accent:hsl(var(--h,160) 72% 64%);--grid:rgba(230,237,243,.045)}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg) linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px;font:16px/1.65 "Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em;line-height:1.15}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.hero{padding:64px 0 28px}
+.hero p.sub{margin:0 0 6px;color:var(--mute)}
+.hero h1{font-size:clamp(2.3rem,6vw,4rem);margin:.1em 0 .25em;max-width:14ch}
+.hero .lead{max-width:56ch;color:var(--mute);margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.88rem}
+.chip b{color:var(--mute);font-weight:500;margin-right:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:20px 0 72px}
+.card{display:flex;flex-direction:column;gap:10px;min-height:230px;background:var(--paper);border:1px solid var(--line);border-radius:6px 22px 6px 6px;padding:22px;text-decoration:none;color:inherit;transition:background .18s,color .18s,border-color .18s}
+.card .no{font:700 2.6rem/1 "Bricolage Grotesque",ui-sans-serif,sans-serif;color:var(--accent);transition:color .18s}
+.card h3{margin:0;font-size:1.12rem}
+.card p{margin:0;font-size:.92rem;color:var(--mute);flex:1;transition:color .18s}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font:.74rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--mute)}
+.card:hover,.card:focus-visible{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card:hover .no,.card:focus-visible .no{color:var(--accent)}
+.card:hover p,.card:focus-visible p{color:var(--bg);opacity:.8}
+.card:hover .tags span{color:var(--bg);border-color:rgba(255,255,255,.35)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0 0;font-size:.92rem}
+.top a{color:var(--mute);text-decoration:none}.top a:hover{color:var(--accent)}
+.page-head{padding:28px 0 8px}
+.page-head h1{font-size:clamp(1.8rem,4.5vw,2.9rem);margin:.2em 0 .3em}
+.page-head p{max-width:64ch;color:var(--mute);margin:0 0 18px}
+section{margin:38px 0}
+h2{font-size:1.3rem;margin:0 0 12px}
+.notes{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;padding:6px 22px}
+.notes p,.notes li{max-width:80ch}
+.notes code,td code{font:.86em "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.win{background:#0d1219;border:1px solid #243140;border-radius:10px;overflow:hidden;margin:14px 0}
+.bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:#161e29;color:#8fa1b3;font:.78rem "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+.bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.bar .r{background:#ff5f57}.bar .y{background:#febc2e}.bar .g{background:#28c840}
+.bar em{margin-left:8px;font-style:normal}
+pre{margin:0;padding:16px 18px;overflow:auto;color:#d5dde6;font:.8rem/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}
+.out pre{color:#b9f3d6}
+.c{color:#6c7f92;font-style:italic}.s{color:#a6e22e}.k{color:#c792ea}.n{color:#ffb86c}.p{color:#5ec4ff}
+.pager{display:flex;justify-content:space-between;gap:12px;padding:8px 0 56px}
+.pager a{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 16px;text-decoration:none;color:var(--ink)}
+.pager a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--mute);font-size:.88rem}
+@media (max-width:560px){.wrap{padding:0 16px}.hero{padding-top:40px}}
+
+.card{--accent:hsl(var(--h,160) 72% 30%)}
+@media (prefers-color-scheme:dark){.card{--accent:hsl(var(--h,160) 72% 64%)}}
+.win{box-shadow:0 18px 40px -24px hsl(var(--h,160) 70% 40%/.55)}
+.page-head h1{border-left:6px solid var(--accent);padding-left:14px}
+
+:root{--h:120}</style></head><body>
+<div class="wrap"><div class="top"><a href="index.html">&larr; All tasks</a><span>Task 8 of 8</span></div>
+<div class="page-head"><h1>Task 8: Concurrent API Aggregator (async/await)</h1><p>getJSON, fakeFetch with six failure modes, a concurrent dashboard and an AbortController timeout.</p><div class="chips"><span class="chip"><b>Name</b>Aneeq Abdullah</span><span class="chip"><b>Reg no</b>241803</span><span class="chip"><b>Class</b>BSCS VA</span><span class="chip"><b>Course</b>FSWD Lab</span><span class="chip"><b>Lab</b>Lab 5</span></div></div>
+<section><h2>Approach and explanation</h2><div class="notes"><p><b>Concurrency.</b> <code>/users</code>, <code>/courses</code> and <code>/results</code> do not depend on each other, so all three requests are started first (<code>map</code>) and awaited together with <code>Promise.all</code>. The timing output shows about one request's latency (~150 ms) versus the sum (~450 ms) for sequential awaits.</p><p><b>Errors.</b> <code>getJSON</code> lets network failures and aborts propagate, throws an <code>HttpError</code> when <code>response.ok</code> is false, and lets JSON parse failures surface as <code>SyntaxError</code>. <code>classify()</code> maps them to HTTP failure, network failure, invalid JSON, or timeout/abort.</p><p><b>Timeout.</b> <code>fetchWithTimeout</code> aborts the request through an <code>AbortController</code> when the timer fires, and <code>finally { clearTimeout(timer) }</code> cleans the timer up on success and on failure. Failed dashboard calls reject the whole <code>Promise.all</code>, as the last output block shows.</p></div></section>
+<section><h2>Source code</h2><div class="win "><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>task8.js</em></div><pre><span class="c">// Task 8 - Concurrent Academic API Aggregator with async/await</span>
+<span class="k">const</span> users = [
+  { id: <span class="n">1</span>, name: <span class="s">'Ali'</span>, department: <span class="s">'CS'</span> }, { id: <span class="n">2</span>, name: <span class="s">'Sara'</span>, department: <span class="s">'CS'</span> },
+  { id: <span class="n">3</span>, name: <span class="s">'Usman'</span>, department: <span class="s">'SE'</span> }, { id: <span class="n">4</span>, name: <span class="s">'Hina'</span>, department: <span class="s">'AI'</span> },
+  { id: <span class="n">5</span>, name: <span class="s">'Zoya'</span>, department: <span class="s">'AI'</span> },
+];
+<span class="k">const</span> courses = [{ id: <span class="s">'FSWD'</span>, title: <span class="s">'Full Stack Web Development'</span> }, { id: <span class="s">'DB'</span>, title: <span class="s">'Databases'</span> }, { id: <span class="s">'AI'</span>, title: <span class="s">'Intro to AI'</span> }];
+<span class="k">const</span> results = [
+  { userId: <span class="n">1</span>, courseId: <span class="s">'FSWD'</span>, marks: <span class="n">82</span> }, { userId: <span class="n">1</span>, courseId: <span class="s">'DB'</span>, marks: <span class="n">76</span> },
+  { userId: <span class="n">2</span>, courseId: <span class="s">'FSWD'</span>, marks: <span class="n">91</span> }, { userId: <span class="n">2</span>, courseId: <span class="s">'DB'</span>, marks: <span class="n">88</span> },
+  { userId: <span class="n">3</span>, courseId: <span class="s">'FSWD'</span>, marks: <span class="n">47</span> }, { userId: <span class="n">3</span>, courseId: <span class="s">'DB'</span>, marks: <span class="n">42</span> },
+  { userId: <span class="n">4</span>, courseId: <span class="s">'AI'</span>, marks: <span class="n">73</span> }, { userId: <span class="n">5</span>, courseId: <span class="s">'AI'</span>, marks: <span class="n">91</span> },
+];
+
+<span class="k">const</span> ROUTES = {
+  <span class="s">'/users'</span>: { status: <span class="n">200</span>, body: users },
+  <span class="s">'/courses'</span>: { status: <span class="n">200</span>, body: courses },
+  <span class="s">'/results'</span>: { status: <span class="n">200</span>, body: results },
+  <span class="s">'/missing'</span>: { status: <span class="n">404</span>, statusText: <span class="s">'Not Found'</span>, body: { error: <span class="s">'nope'</span> } },
+  <span class="s">'/error'</span>: { status: <span class="n">500</span>, statusText: <span class="s">'Internal Server Error'</span>, body: { error: <span class="s">'boom'</span> } },
+  <span class="s">'/network'</span>: { network: <span class="k">true</span> },
+  <span class="s">'/badjson'</span>: { status: <span class="n">200</span>, raw: <span class="s">'{ this is not json'</span> },
+  <span class="s">'/slow'</span>: { status: <span class="n">200</span>, body: { message: <span class="s">'slow but fine'</span> }, delay: <span class="n">400</span> },
+};
+
+<span class="c">// Behaves like fetch(): resolves with a response-shaped object, rejects on network failure or abort</span>
+<span class="k">function</span> fakeFetch(url, { signal } = {}) {
+  <span class="k">return</span> <span class="k">new</span> Promise((resolve, reject) =&gt; {
+    <span class="k">if</span> (signal?.aborted) <span class="k">return</span> reject(signal.reason);
+    <span class="k">const</span> route = ROUTES[url] ?? { status: <span class="n">404</span>, statusText: <span class="s">'Not Found'</span>, body: {} };
+    <span class="k">const</span> timer = setTimeout(() =&gt; {
+      <span class="k">if</span> (route.network) <span class="k">return</span> reject(<span class="k">new</span> TypeError(<span class="s">'fetch failed: network unreachable'</span>));
+      resolve({
+        ok: route.status &gt;= <span class="n">200</span> &amp;&amp; route.status &lt; <span class="n">300</span>,
+        status: route.status,
+        statusText: route.statusText ?? <span class="s">'OK'</span>,
+        <span class="k">async</span> json() {
+          <span class="k">if</span> (route.raw !== <span class="k">undefined</span>) <span class="k">return</span> JSON.parse(route.raw); <span class="c">// throws SyntaxError</span>
+          <span class="k">return</span> structuredClone(route.body);
+        },
+      });
+    }, route.delay ?? <span class="n">150</span>);
+    signal?.addEventListener(<span class="s">'abort'</span>, () =&gt; { clearTimeout(timer); reject(signal.reason); }, { once: <span class="k">true</span> });
+  });
+}
+
+<span class="k">class</span> HttpError <span class="k">extends</span> Error {
+  constructor(status, message) { <span class="k">super</span>(message); <span class="k">this</span>.name = <span class="s">'HttpError'</span>; <span class="k">this</span>.status = status; }
+}
+
+<span class="k">async</span> <span class="k">function</span> getJSON(url, fetchImplementation, options) {
+  <span class="k">const</span> response = <span class="k">await</span> fetchImplementation(url, options); <span class="c">// network failure / abort propagate as-is</span>
+  <span class="k">if</span> (!response.ok) <span class="k">throw</span> <span class="k">new</span> HttpError(response.status, <span class="s">`HTTP ${response.status} ${response.statusText} for ${url}`</span>);
+  <span class="k">return</span> <span class="k">await</span> response.json(); <span class="c">// invalid JSON propagates as SyntaxError</span>
+}
+
+<span class="k">async</span> <span class="k">function</span> fetchWithTimeout(url, milliseconds) {
+  <span class="k">const</span> controller = <span class="k">new</span> AbortController();
+  <span class="k">const</span> timer = setTimeout(() =&gt; controller.abort(<span class="k">new</span> DOMException(<span class="s">`Timed out after ${milliseconds}ms`</span>, <span class="s">'TimeoutError'</span>)), milliseconds);
+  <span class="k">try</span> {
+    <span class="k">return</span> <span class="k">await</span> getJSON(url, fakeFetch, { signal: controller.signal });
+  } <span class="k">finally</span> {
+    clearTimeout(timer); <span class="c">// runs on success AND on failure</span>
+  }
+}
+
+<span class="k">function</span> classify(err) {
+  <span class="k">if</span> (err <span class="k">instanceof</span> HttpError) <span class="k">return</span> <span class="s">`HTTP failure (${err.status})`</span>;
+  <span class="k">if</span> (err.name === <span class="s">'TimeoutError'</span> || err.name === <span class="s">'AbortError'</span>) <span class="k">return</span> <span class="s">'timeout / abort'</span>;
+  <span class="k">if</span> (err <span class="k">instanceof</span> SyntaxError) <span class="k">return</span> <span class="s">'invalid JSON'</span>;
+  <span class="k">if</span> (err <span class="k">instanceof</span> TypeError) <span class="k">return</span> <span class="s">'network failure'</span>;
+  <span class="k">return</span> <span class="s">'unknown error'</span>;
+}
+
+<span class="k">const</span> avg = (nums) =&gt; (nums.length ? Number((nums.reduce((s, n) =&gt; s + n, <span class="n">0</span>) / nums.length).toFixed(<span class="n">2</span>)) : <span class="n">0</span>);
+
+<span class="k">function</span> buildStats(userList, courseList, resultList) {
+  <span class="k">const</span> perStudent = userList.map((u) =&gt; ({ ...u, average: avg(resultList.filter((r) =&gt; r.userId === u.id).map((r) =&gt; r.marks)) }));
+  <span class="k">const</span> top = perStudent.reduce((best, s) =&gt; (s.average &gt; best.average ? s : best));
+  <span class="k">const</span> departments = perStudent.reduce((acc, s) =&gt; {
+    <span class="k">const</span> d = acc[s.department] ?? { students: <span class="n">0</span>, total: <span class="n">0</span>, failed: <span class="n">0</span> };
+    <span class="k">return</span> { ...acc, [s.department]: { students: d.students + <span class="n">1</span>, total: d.total + s.average, failed: d.failed + (s.average &lt; <span class="n">50</span> ? <span class="n">1</span> : <span class="n">0</span>) } };
+  }, {});
+  <span class="k">return</span> {
+    totalStudents: userList.length,
+    totalCourses: courseList.length,
+    overallAverage: avg(resultList.map((r) =&gt; r.marks)),
+    topStudent: <span class="s">`${top.name} (${top.average})`</span>,
+    failedStudents: perStudent.filter((s) =&gt; s.average &lt; <span class="n">50</span>).length,
+    departments: Object.fromEntries(Object.entries(departments).map(([k, d]) =&gt; [k, { students: d.students, average: avg([d.total / d.students]), failed: d.failed }])),
+  };
+}
+
+<span class="k">async</span> <span class="k">function</span> loadDashboard() {
+  <span class="c">// All three requests START immediately; Promise.all waits for the slowest one</span>
+  <span class="k">const</span> [u, c, r] = <span class="k">await</span> Promise.all([<span class="s">'/users'</span>, <span class="s">'/courses'</span>, <span class="s">'/results'</span>].map((path) =&gt; fetchWithTimeout(path, <span class="n">1000</span>)));
+  <span class="k">return</span> buildStats(u, c, r);
+}
+
+<span class="k">async</span> <span class="k">function</span> loadSequentially() {
+  <span class="k">const</span> u = <span class="k">await</span> fetchWithTimeout(<span class="s">'/users'</span>, <span class="n">1000</span>); <span class="c">// each await waits for the previous one</span>
+  <span class="k">const</span> c = <span class="k">await</span> fetchWithTimeout(<span class="s">'/courses'</span>, <span class="n">1000</span>);
+  <span class="k">const</span> r = <span class="k">await</span> fetchWithTimeout(<span class="s">'/results'</span>, <span class="n">1000</span>);
+  <span class="k">return</span> buildStats(u, c, r);
+}
+
+<span class="k">async</span> <span class="k">function</span> timed(label, fn) {
+  <span class="k">const</span> start = performance.now();
+  <span class="k">const</span> value = <span class="k">await</span> fn();
+  console.log(<span class="s">`${label}: ${Math.round(performance.now() - start)} ms`</span>);
+  <span class="k">return</span> value;
+}
+
+console.log(<span class="s">'--- Dashboard ---'</span>);
+console.log(<span class="k">await</span> timed(<span class="s">'concurrent (Promise.all)'</span>, loadDashboard));
+<span class="k">await</span> timed(<span class="s">'sequential awaits       '</span>, loadSequentially);
+
+console.log(<span class="s">'\n--- Error classification (500 ms timeout, 100 ms for /slow) ---'</span>);
+<span class="k">for</span> (<span class="k">const</span> path <span class="k">of</span> [<span class="s">'/users'</span>, <span class="s">'/missing'</span>, <span class="s">'/error'</span>, <span class="s">'/network'</span>, <span class="s">'/badjson'</span>, <span class="s">'/slow'</span>]) {
+  <span class="k">try</span> {
+    <span class="k">const</span> data = <span class="k">await</span> fetchWithTimeout(path, path === <span class="s">'/slow'</span> ? <span class="n">100</span> : <span class="n">500</span>);
+    console.log(<span class="s">`${path.padEnd(9)} OK (${Array.isArray(data) ? data.length + ' items' : 'object'})`</span>);
+  } <span class="k">catch</span> (err) {
+    console.log(<span class="s">`${path.padEnd(9)} ${classify(err).padEnd(18)} &lt;- ${err.name}: ${err.message}`</span>);
+  }
+}
+console.log(<span class="s">'/slow with a 1000 ms timeout -&gt;'</span>, <span class="k">await</span> fetchWithTimeout(<span class="s">'/slow'</span>, <span class="n">1000</span>));
+
+console.log(<span class="s">'\n--- One failing endpoint rejects the whole Promise.all ---'</span>);
+<span class="k">try</span> {
+  <span class="k">await</span> Promise.all([<span class="s">'/users'</span>, <span class="s">'/courses'</span>, <span class="s">'/missing'</span>].map((p) =&gt; getJSON(p, fakeFetch)));
+} <span class="k">catch</span> (err) {
+  console.log(<span class="s">'Dashboard load failed:'</span>, classify(err));
+}
+</pre></div></section>
+<section><h2>Node.js output</h2><div class="win out"><div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><em>PS CampusFlow-Lab5&gt; node task8.js</em></div><pre>--- Dashboard ---
+concurrent (Promise.all): 151 ms
+{
+  totalStudents: 5,
+  totalCourses: 3,
+  overallAverage: 73.75,
+  topStudent: 'Zoya (91)',
+  failedStudents: 1,
+  departments: {
+    CS: { students: 2, average: 84.25, failed: 0 },
+    SE: { students: 1, average: 44.5, failed: 1 },
+    AI: { students: 2, average: 82, failed: 0 }
+  }
+}
+sequential awaits       : 453 ms
+
+--- Error classification (500 ms timeout, 100 ms for /slow) ---
+/users    OK (5 items)
+/missing  HTTP failure (404) &lt;- HttpError: HTTP 404 Not Found for /missing
+/error    HTTP failure (500) &lt;- HttpError: HTTP 500 Internal Server Error for /error
+/network  network failure    &lt;- TypeError: fetch failed: network unreachable
+/badjson  invalid JSON       &lt;- SyntaxError: Expected property name or '}' in JSON at position 2 (line 1 column 3)
+/slow     timeout / abort    &lt;- TimeoutError: Timed out after 100ms
+/slow with a 1000 ms timeout -&gt; { message: 'slow but fine' }
+
+--- One failing endpoint rejects the whole Promise.all ---
+Dashboard load failed: HTTP failure (404)</pre></div></section>
+<div class="pager"><a href="task7.html">&larr; Task 7</a><a href="index.html">Back to index</a></div></div><footer><div class="wrap">Aneeq Abdullah &middot; 241803 &middot; BSCS VA &middot; FSWD Lab &middot; Lab 5</div></footer></body></html>
